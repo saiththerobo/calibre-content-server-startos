@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.svg" alt="Calibre Content Server Logo" width="21%">
+  <img src="icon.png" alt="Calibre Content Server Logo" width="21%">
 </p>
 
 # Calibre Content Server on StartOS
