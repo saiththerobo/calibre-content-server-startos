@@ -1,17 +1,21 @@
 # Updating the upstream version
 
-This package wraps Start9 Labs' own [hello-world](https://github.com/Start9Labs/hello-world) source, which we build and publish ourselves as `ghcr.io/start9labs/hello-world`. "Upstream" here means that source repo, not the image namespace.
+This package builds a custom Docker image from the official Calibre standalone Linux tarball, pinned to a specific version.
 
 ## Determining the upstream version
 
-- **hello-world** ([Start9Labs/hello-world](https://github.com/Start9Labs/hello-world)) — fetch the latest release tag:
+Check the latest Calibre release on GitHub:
 
-  ```sh
-  gh release view -R Start9Labs/hello-world --json tagName -q .tagName
-  ```
+```sh
+gh release view -R kovidgoyal/calibre --json tagName -q .tagName
+```
 
-  The current pin lives in `startos/manifest/index.ts` at `images['hello-world'].source.dockerTag` (the version after the `:` in `ghcr.io/start9labs/hello-world:<version>`).
+The current pin is the `CALIBRE_VERSION` build arg in `Dockerfile` (e.g. `9.8.0`).
 
 ## Applying the bump
 
-- Bump `dockerTag` in `startos/manifest/index.ts` to `ghcr.io/start9labs/hello-world:<new version>` (drop the leading `v` from the release tag).
+1. Update `ARG CALIBRE_VERSION=<new version>` in `Dockerfile`.
+2. Update `version` in `startos/versions/current.ts` to `<new version>:0` and update `releaseNotes`.
+3. Verify the new release has the expected tarball names:
+   - `calibre-<version>-x86_64.txz`
+   - `calibre-<version>-arm64.txz`
