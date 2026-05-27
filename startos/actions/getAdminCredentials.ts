@@ -11,7 +11,7 @@ export const getAdminCredentials = sdk.Action.withoutInput(
     warning: null,
     allowedStatuses: 'any',
     group: null,
-    visibility: 'hidden',
+    visibility: 'enabled',
   }),
 
   async ({ effects }) => {
