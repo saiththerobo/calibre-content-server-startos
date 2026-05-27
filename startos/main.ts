@@ -20,6 +20,19 @@ export const main = sdk.setupMain(async ({ effects }) => {
   )
 
   return sdk.Daemons.of(effects)
+    .addOneshot('init-library', {
+      subcontainer: calibreSub,
+      exec: {
+        command: [
+          '/opt/calibre/calibre-debug', '-c',
+          [
+            'from calibre.db.legacy import LibraryDatabase',
+            "LibraryDatabase('/library')",
+          ].join('\n'),
+        ],
+      },
+      requires: [],
+    })
     .addOneshot('create-admin-user', {
       subcontainer: calibreSub,
       exec: {
@@ -36,7 +49,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
           adminPassword ?? '',
         ],
       },
-      requires: [],
+      requires: ['init-library'],
     })
     .addDaemon('primary', {
       subcontainer: calibreSub,
@@ -46,6 +59,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
           '--port', String(uiPort),
           '--enable-auth',
           '--userdb', '/config/users.db',
+          '--disable-bonjour',
           '/library',
         ],
       },

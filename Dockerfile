@@ -19,11 +19,24 @@ RUN case "$TARGETARCH" in \
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    libglib2.0-0 \
+    libopengl0 \
+    libgl1 \
+    libegl1 \
+    libdbus-1-3 \
+    libfontconfig1 \
+    libfreetype6 \
+    libxcb1 \
+    libx11-6 \
+    libxext6 \
+    libxkbcommon0 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /opt/calibre /opt/calibre
 
-ENV PATH="/opt/calibre:$PATH"
+# No display available; use offscreen Qt platform so cover generation works headlessly
+ENV PATH="/opt/calibre:$PATH" \
+    QT_QPA_PLATFORM=offscreen
 VOLUME /library
 VOLUME /config
 EXPOSE 8080
