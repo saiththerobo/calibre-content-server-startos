@@ -19,7 +19,19 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     query: {},
   })
 
-  const uiReceipt = await uiMultiOrigin.export([ui])
+  const opds = sdk.createInterface(effects, {
+    name: i18n('OPDS Catalog'),
+    id: 'opds',
+    description: i18n('OPDS feed URL — paste this into KOreader, Moon+ Reader, or any OPDS-compatible reading app'),
+    type: 'api',
+    masked: false,
+    schemeOverride: null,
+    username: null,
+    path: '/opds',
+    query: {},
+  })
+
+  const uiReceipt = await uiMultiOrigin.export([ui, opds])
 
   return [uiReceipt]
 })

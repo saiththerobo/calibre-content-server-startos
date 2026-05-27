@@ -10,13 +10,15 @@ const dict = {
   // interfaces.ts
   'Web UI': 4,
   'The Calibre Content Server web interface for browsing and reading your ebook library': 5,
+  'OPDS Catalog': 6,
+  'OPDS feed URL — paste this into KOreader, Moon+ Reader, or any OPDS-compatible reading app': 7,
 
   // actions/getAdminCredentials.ts
-  'Get Admin Credentials': 6,
-  'Retrieve your Calibre admin username and password': 7,
+  'Get Admin Credentials': 8,
+  'Retrieve your Calibre admin username and password': 9,
 
   // init/initializeService.ts
-  'Retrieve your admin credentials': 8,
+  'Retrieve your admin credentials': 10,
 } as const
 
 /**
