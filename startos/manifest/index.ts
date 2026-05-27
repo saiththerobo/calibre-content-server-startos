@@ -2,19 +2,20 @@ import { setupManifest } from '@start9labs/start-sdk'
 import { long, short } from './i18n'
 
 export const manifest = setupManifest({
-  id: 'hello-world',
-  title: 'Hello World',
-  license: 'MIT',
-  packageRepo: 'https://github.com/Start9Labs/hello-world-startos',
-  upstreamRepo: 'https://github.com/Start9Labs/hello-world',
-  marketingUrl: 'https://start9.com/',
-  donationUrl: 'https://donate.start9.com/',
+  id: 'calibre-content-server',
+  title: 'Calibre Content Server',
+  license: 'GPL-3.0',
+  packageRepo: 'https://github.com/saiththerobo/calibre-content-server-startos',
+  upstreamRepo: 'https://github.com/kovidgoyal/calibre',
+  marketingUrl: 'https://calibre-ebook.com/',
+  donationUrl: 'https://calibre-ebook.com/donate',
+  docsUrls: ['https://manual.calibre-ebook.com/server.html'],
   description: { short, long },
-  volumes: ['main'],
+  volumes: ['main', 'books'],
   images: {
-    'hello-world': {
-      source: { dockerTag: 'ghcr.io/start9labs/hello-world:2.0.0' },
-      arch: ['x86_64', 'aarch64', 'riscv64'],
+    calibre: {
+      source: { dockerBuild: { workdir: '.' } },
+      arch: ['x86_64', 'aarch64'],
     },
   },
   alerts: {

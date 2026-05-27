@@ -1,25 +1,31 @@
-# Hello World
+# Calibre Content Server
 
-You've installed Hello World — there's nothing to configure and nothing to set up. This page covers how to open the page it serves and where to read more. (If you're a developer, Hello World is also the recommended packaging template.)
+Calibre Content Server lets you browse and read your ebook library from any browser, and connect reading apps on your phone or e-reader via OPDS.
+
+## First-time setup
+
+After installation, a critical notification will appear — click **Get Admin Credentials** to retrieve your username (`admin`) and generated password. You will need these to log in to the web interface.
+
+## Accessing the library
+
+1. Open the **Dashboard** tab.
+2. Click **Web UI** to open the library in your browser.
+3. Log in with the credentials from **Get Admin Credentials**.
+
+## Adding books
+
+You can add books directly from the web interface using the upload button. Supported formats include EPUB, MOBI, PDF, CBZ, and many others.
+
+You can also connect the Calibre desktop app on your computer to this server via **Connect/Share → Connect to Calibre Content Server**, which gives you full library management (metadata editing, format conversion, bulk imports).
+
+## Reading apps (OPDS)
+
+Any OPDS-compatible app can connect to your library. Add your server's URL with `/opds` appended as an OPDS catalog. For example:
+
+- **KOreader**: Settings → OPDS catalog → add URL
+- **Moon+ Reader**: Library → Network Library → OPDS
 
 ## Documentation
 
-- [Hello World upstream docs](https://github.com/Start9Labs/hello-world/blob/master/README.md) — the README for the web server this package runs.
-- [StartOS Packaging Guide](https://docs.start9.com/packaging) — how to build a StartOS service package from that template.
-
-## What you get on StartOS
-
-- **A running web server** that serves a single static page.
-- **Nothing to configure and no actions** — the service starts on its own and is immediately usable.
-
-## Getting set up
-
-There's no setup wizard, no admin password, no first-run prompt — Hello World is usable the moment it starts. To view the page it serves:
-
-1. Open Hello World's **Dashboard** tab.
-2. Click the **Web UI** interface to open the served page in your browser.
-
-## Limitations
-
-- Hello World is intentionally minimal. It is not a useful service on its own; it exists to demonstrate the StartOS packaging system.
-- The page content is static and cannot be customized through the StartOS UI.
+- [Calibre Content Server manual](https://manual.calibre-ebook.com/server.html) — full reference for the content server.
+- [Calibre upstream docs](https://calibre-ebook.com/) — general Calibre documentation.

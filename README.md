@@ -1,16 +1,12 @@
 <p align="center">
-  <img src="icon.svg" alt="Hello World Logo" width="21%">
+  <img src="icon.svg" alt="Calibre Content Server Logo" width="21%">
 </p>
 
-# Hello World on StartOS
+# Calibre Content Server on StartOS
 
-> **Upstream repo:** <https://github.com/Start9Labs/hello-world>
+> **Upstream repo:** <https://github.com/kovidgoyal/calibre>
 
-A minimal reference service for StartOS. It displays a simple web page — nothing more. Use [this repository](https://github.com/Start9Labs/hello-world-startos) as a template when packaging a new service for StartOS.
-
-## Getting Started
-
-To learn how to use this template to create your own StartOS service package, see the [Packaging Guide](https://docs.start9.com/packaging).
+Calibre Content Server is the built-in web server from Calibre, the most popular open-source ebook manager. Browse your library, read books in the browser, upload new titles, and connect any OPDS-compatible reading app — all hosted on your own node.
 
 ---
 
@@ -34,39 +30,54 @@ To learn how to use this template to create your own StartOS service package, se
 
 ## Image and Container Runtime
 
-| Property      | Value                                  |
-| ------------- | -------------------------------------- |
-| Image         | `ghcr.io/start9labs/hello-world`       |
-| Architectures | x86_64, aarch64, riscv64               |
-| Command       | `hello-world`                          |
+| Property      | Value                                               |
+| ------------- | --------------------------------------------------- |
+| Image         | Custom Dockerfile (`debian:bookworm-slim` + calibre) |
+| Calibre version | 9.8.0                                             |
+| Architectures | x86_64, aarch64                                     |
+| Entrypoint    | `/opt/calibre/calibre-server`                       |
+
+The image is built from `debian:bookworm-slim`. The calibre standalone tarball is downloaded from the [official GitHub releases](https://github.com/kovidgoyal/calibre/releases) and extracted to `/opt/calibre`. This gives the full calibre suite (including `ebook-convert` and `calibre-debug`) without the desktop/VNC stack present in `linuxserver/calibre`.
 
 ---
 
 ## Volume and Data Layout
 
-| Volume | Mount Point | Purpose         |
-| ------ | ----------- | --------------- |
-| `main` | `/data`     | Persistent data |
+| Volume  | Mount Point | Purpose                                        |
+| ------- | ----------- | ---------------------------------------------- |
+| `main`  | `/config`   | User database (`users.db`), server state       |
+| `books` | `/library`  | Calibre library (metadata.db + book files)     |
 
 ---
 
 ## Installation and First-Run Flow
 
-No special setup. Install and start — the web page is immediately available.
+1. On install, a random 22-character admin password is generated and saved to `main/store.json`.
+2. A critical task notification appears prompting you to run **Get Admin Credentials** to retrieve your login.
+3. On first start, a oneshot uses `calibre-debug` to create the `admin` user in `main/users.db` if it does not already exist.
+4. `calibre-server` starts, serves the library at `/library` on port 8080, and marks itself ready once the port is listening.
+
+An empty library is created automatically by calibre-server if none exists yet.
 
 ---
 
 ## Configuration Management
 
-No configurable settings. The service runs with no user-facing configuration.
+No StartOS-managed config file. All server configuration is passed as CLI flags at startup:
+
+```
+calibre-server --port=8080 --enable-auth --userdb=/config/users.db /library
+```
 
 ---
 
 ## Network Access and Interfaces
 
-| Interface | Port | Protocol | Purpose              |
-| --------- | ---- | -------- | -------------------- |
-| Web UI    | 80   | HTTP     | Hello World web page |
+| Interface | Port | Protocol | Purpose                         |
+| --------- | ---- | -------- | ------------------------------- |
+| Web UI    | 8080 | HTTP     | Calibre Content Server web UI   |
+
+The same port also serves the OPDS catalog at `/opds`. Connect any OPDS-compatible app (KOreader, Moon+ Reader, etc.) to your node's URL with path `/opds`.
 
 **Access methods:**
 
@@ -79,7 +90,9 @@ No configurable settings. The service runs with no user-facing configuration.
 
 ## Actions (StartOS UI)
 
-None.
+| Action                  | Status Filter | Description                                        |
+| ----------------------- | ------------- | -------------------------------------------------- |
+| Get Admin Credentials   | Any           | Returns the `admin` username and generated password |
 
 ---
 
@@ -87,17 +100,18 @@ None.
 
 **Included in backup:**
 
-- `main` volume
+- `main` volume (user database, store)
+- `books` volume (the entire Calibre library)
 
-**Restore behavior:** Volume is fully restored before the service starts.
+**Restore behavior:** Both volumes are fully restored before the service starts. The admin password and library are preserved across restores.
 
 ---
 
 ## Health Checks
 
-| Check         | Method              | Messages                                                           |
-| ------------- | ------------------- | ------------------------------------------------------------------ |
-| Web Interface | Port listening (80) | Success: "The web interface is ready" / Error: "The web interface is not ready" |
+| Check         | Method                   | Messages                                                                         |
+| ------------- | ------------------------ | -------------------------------------------------------------------------------- |
+| Web Interface | Port listening (8080)    | Success: "The web interface is ready" / Error: "The web interface is not ready"  |
 
 ---
 
@@ -109,13 +123,15 @@ None.
 
 ## Limitations and Differences
 
-1. **No meaningful functionality** — this is a reference/template package only
+1. **No GUI library management** — the Calibre desktop GUI is not available. Books are managed via the web upload interface or by connecting the Calibre desktop app to the server using its "Connect/Share" feature.
+2. **Single admin user** — only the `admin` user is created automatically. Additional users can be added by running `calibre-server --manage-users` on the node directly.
+3. **No riscv64** — the upstream calibre project does not publish a riscv64 binary release.
 
 ---
 
 ## What Is Unchanged from Upstream
 
-The service is identical to upstream. There are no modifications.
+`calibre-server` runs unmodified. No patches are applied. The only difference from running calibre-server manually is that authentication is enabled by default and the admin password is managed by StartOS.
 
 ---
 
@@ -128,14 +144,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 ## Quick Reference for AI Consumers
 
 ```yaml
-package_id: hello-world
-image: ghcr.io/start9labs/hello-world
-architectures: [x86_64, aarch64, riscv64]
+package_id: calibre-content-server
+image: custom Dockerfile (debian:bookworm-slim + calibre 9.8.0 tarball)
+architectures: [x86_64, aarch64]
 volumes:
-  main: /data
+  main: /config       # users.db, store.json
+  books: /library     # Calibre library (metadata.db + book files)
 ports:
-  ui: 80
+  ui: 8080            # web UI + OPDS at /opds
 dependencies: none
+auth: enabled, admin user created on first start via calibre-debug
+actions:
+  get-admin-credentials: returns admin username and password
 startos_managed_env_vars: none
-actions: none
 ```
