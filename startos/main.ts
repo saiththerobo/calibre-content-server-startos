@@ -59,7 +59,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
           '--port', String(uiPort),
           '--enable-auth',
           '--userdb', '/config/users.db',
-          '--disable-bonjour',
+          '--disable-use-bonjour',
           '/library',
         ],
       },
