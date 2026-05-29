@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim AS builder
 ARG TARGETARCH
-ARG CALIBRE_VERSION=9.8.0
+ARG CALIBRE_VERSION=9.9.0
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates wget xz-utils \
